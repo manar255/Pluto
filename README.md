@@ -1,2 +1,2 @@
-# Pluto-
+# Pluto
 Real time chat app
