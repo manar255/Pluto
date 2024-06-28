@@ -3,14 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/front-end/main.css" rel="stylesheet" />
+    <link href="/front-end/login.css" rel="stylesheet" />
     <title>login</title>
 </head>
 <body>
-    <div class="login-card">
+    <div class="form-card">
         <div class="image">
-            <img src="/util/Mobile login-cuate - Copy.png" width="500" height="500"/>
+            <img src="/front-end/util/Mobile login-cuate - Copy.png" width="500" height="500"/>
         </div>
-        <div class="login-form">
+        <div class="form-contaner">
+            <h1>Login</h1>
+
             <form action="/login" method="post" enctype="multipart/form-data">
                
                <label>Username</label>
@@ -21,6 +25,8 @@
                 
                 <input type="submit" value="login" />
             </form>
+            <p>You don't have account <a href="/front-end/Register.html">Sign up</a></p>
+
         </div>
     </div>
 
