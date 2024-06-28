@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/front-end/main.css" rel="stylesheet" />
+    <link href="/front-end/Register.css" rel="stylesheet" />
+
     <title>register</title>
     <style>
         .custom-file-upload {
@@ -27,20 +30,21 @@
     </style>
 </head>
 <body>
-    <div>
-        <div>
-            <img src="/util/Mobile login-pana.png" width="500" height="500"/>
+    <div class="form-card">
+        <div class="image">
+            <img src="/front-end/util/Mobile login-pana.png" />
         </div>
-        <div>
+        <div class="form-contaner">
             <form action="/register" method="post" enctype="multipart/form-data">
+                <h1>Register</h1>
                 <!-- //upload image  -->
-                <label for="image" class="custom-file-upload">
+                <!-- <label for="image" class="custom-file-upload">
                     Choose Profile Picture
                 </label>
                 <input type="file" name="image" id="image" accept="image/*" class="file-input" onchange="previewImage(event)" />
                 <br>
                 <img id="image-preview" class="image-preview" />
-                <br>
+                <br> -->
                 <label>First Name</label>
                 <input type="text" name="first_name" placeholder="First Name" required/>
                 <label>Last Name</label>
@@ -53,6 +57,8 @@
                 <input type="password" name="confirm_password" placeholder="Confirm Password" required/>
                 <input type="submit" value="Register" />
             </form>
+            <p>Already have an account? <a href="/front-end/login.html">Login</a></p>
+
         </div>
     </div>
 
