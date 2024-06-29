@@ -4,38 +4,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=Chat, initial-scale=1.0">
-    <title>ploto</title>
+    <!-- <link href="/front-end/main.css" rel="stylesheet" /> -->
+    <link href="/front-end/chat page.css" rel="stylesheet" />
+    <!-- Add Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <title>Pluto</title>
 </head>
 
 <body>
     <header>
-        <img src="" width=50 height="50">
-        <h1>Pluto</h1>
-        <h5>
-            Manar Khaled
-        </h5>
-        <img src="" width=50 height="50">
+        <div class="logo">
+            <img src="/front-end/util/Pluto.png" width=50 height="50">
+            <h1>Pluto</h1>
+        </div>
+        <div class="user">
+            <img src="/front-end//util/myPhoto1.jpg" width=50 height="50">
+            <h5>
+                Manar Khaled
+            </h5>
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </div>
+
     </header>
     <div class="chat-area">
         <div class="chats">
-            <div class="chat-card">
-                <img src="" width=50 height="50" />
-                <p>full Name</p>
-                <p>userName</p>
-                <p>Message</p>
-                <p>time</p>
+            <div class="search">
+                
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="chat-cards">
+                <div class="chat-card">
+                    <img src="/front-end//util/myPhoto1.jpg" width=50 height="50" />
+                    <div class="card-data">
+                        <div class="right">
+                            <h4 class="name">full Name</h4>
+                            <p class="msg">last Message</p>
+                        </div>
+                        <p class="time">2:25 PM</p>
+                    </div>
+                </div>
+                <div class="chat-card">
+                    <img src="/front-end//util/myPhoto1.jpg" width=50 height="50" />
+                    <div class="card-data">
+                        <div class="right">
+                            <h4 class="name">full Name</h4>
+                            <p class="msg">last Message</p>
+                        </div>
+                        <p class="time">2:25 PM</p>
+                    </div>
+                </div>
+                <div class="chat-card">
+                    <img src="/front-end//util/myPhoto1.jpg" width=50 height="50" />
+                    <div class="card-data">
+                        <div class="right">
+                            <h4 class="name">full Name</h4>
+                            <p class="msg">last Message</p>
+                        </div>
+                        <p class="time">2:25 PM</p>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="Welcome">
+        <!-- <div class="Welcome">
             <p>Welcome Manar Khaled in Pluto chat app.</p>
-        </div>
+        </div> -->
         <div class="chat">
+            <div class="chat-header">
+                <div class="user-info">
+                    <img src="/front-end//util/myPhoto1.jpg" width=50 height="50"/>
+                    <div class="user-name">
+                        <h4>full Name</h4>
+                    </div>
+
+                </div>
+            </div>
             <div class="messages">
                 <div class="send-message">
-                    <p>sended message</p>
+                    <p>Hello!</p>
+                </div>
+                <div class="send-message">
+                    <p>how are you</p>
                 </div>
                 <div class="recieve-message">
-                    <p>recieved message</p>
+                    <p>Hi Manar</p>
+                </div>
+                <div class="recieve-message">
+                    <p>I'm fine and you?</p>
                 </div>
             </div>
             <div class="Send-msg-area">
