@@ -8,21 +8,20 @@
 }
 
 body {
-    background-color: #FFFFFF;
+    background-color:#4a1d3d; /* Dark gray background */
 }
 
 header {
-    background-color: #FF81AE;
+    background-color: #872856; /* Dark pink background for header */
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    width: 100%;
     align-items: center;
     padding: 15px 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 header * {
-    background-color: #FF81AE;
     color: #FFFFFF;
 }
 
@@ -49,8 +48,8 @@ header .user {
 }
 
 .chat-area {
-    height: 700px;
-    background-color:#FF81AE;
+    height: 100vh; /* Full viewport height */
+    background-color: #4a1d3d; /* Dark gray background */
     display: flex;
 }
 
@@ -60,7 +59,7 @@ header .user {
 
 .chats {
     flex: 30%;
-    background-color: #FF81AE;
+    background-color: #4a1d3d; /* Darker pink background for sidebar */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -69,7 +68,7 @@ header .user {
 .search input {
     height: 50px;
     width: 350px;
-    background-color: #f8f4f661;
+    background-color: #5e2750; /* Dark pink for search input */
     border: none;
     border-radius: 25px;
     margin-top: 20px;
@@ -78,25 +77,31 @@ header .user {
     margin-right: auto;
     padding-left: 10px;
     font-size: 20px;
-    
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: #FFFFFF;
 }
-.search input:focus{
+
+.search input:focus {
+    outline: none;
     border: none;
 }
 
 .chat-cards {
     width: 350px;
-    background-color: #f8f4f661;
+    background-color: #5e2750; /* Dark pink for chat cards */
     border-radius: 20px;
     margin-top: 30px;
     padding: 20px;
     margin-left: auto;
     margin-right: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .chat-card {
     display: flex;
-    border-bottom: 2px solid #ffbbd3;
+    border-bottom: 2px solid #6e386c; /* Lighter pink border */
+    padding-bottom: 10px;
+    margin-bottom: 10px;
 }
 
 .chat-card img {
@@ -110,54 +115,61 @@ header .user {
     display: flex;
     flex-direction: row;
     padding-top: 10px;
-    width: 100%;  /* Ensures the card-data stretches to the full width */
+    width: 100%;
     justify-content: space-between;
 }
 
 .card-data h4 {
     font-size: 20px;
+    color: #FFFFFF;
 }
 
 .card-data p {
-    color: #ffffffd2;
+    color: #cccccc;
     margin-top: 5px;
 }
 
 .card-data .right {
     margin-right: 70px;
 }
-/* chat area */
+
+/* Chat area */
 .chat {
     flex: 70%;
-    background-color: #f8f4f661;
+    background-color: #5e2750; /* Dark pink for chat area */
     border-radius: 30px;
-    height: 600px;
+    height: 620px;
     margin: 20px;
     position: relative;
-    
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-.chat-header{
+
+.chat-header {
     display: flex;
     width: 100%;
-    background-color: #f76799b1;
-    border-radius: 30px 30px 5px 5px;
+    background-color: #872856; /* Dark pink background for chat header */
+    border-radius: 30px 30px 0 0;
     padding: 10px;
 }
 
-.chat-header img{
- border-radius: 50%;
- width: 50px;
- height: 50px;
+.chat-header img {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
 }
-.user-info{
+
+.user-info {
     display: flex;
 }
-.user-info h4{
-font-size: 20px;
-text-align: center;
-margin-left: 10px;
-margin-top: 15px;
+
+.user-info h4 {
+    font-size: 20px;
+    text-align: center;
+    margin-left: 10px;
+    margin-top: 15px;
+    color: #FFFFFF;
 }
+
 .messages {
     padding: 20px;
     display: flex;
@@ -166,7 +178,7 @@ margin-top: 15px;
 }
 
 .send-message,
-.recieve-message {
+.receive-message {
     max-width: 50%;
     padding: 10px;
     border-radius: 10px;
@@ -174,18 +186,19 @@ margin-top: 15px;
 
 .send-message {
     align-self: flex-end;
-    background-color: #fac3d6c4;
+    background-color: #fac3d6; /* Light pink */
+    color: #333333;
 }
 
-.recieve-message {
+.receive-message {
     align-self: flex-start;
-    background-color: #dedcdc93;
-    color: black;
+    background-color: #dedcdc; /* Light gray */
+    color: #333333;
 }
 
 .Send-msg-area {
     display: flex;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid #dddddd; /* Light gray border */
     padding: 10px;
     position: absolute;
     bottom: 0px;
@@ -193,25 +206,26 @@ margin-top: 15px;
     right: 0;
 }
 
-
 .Send-msg-area input {
     height: 40px;
     flex-grow: 1;
     padding: 10px;
     border-radius: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid #dddddd; /* Light gray border */
     margin-right: 10px;
+    color: #333333;
 }
 
 .Send-msg-area button {
     padding: 10px 20px;
     border: none;
-    background-color: #FF81AE;
+    background-color: #872856; /* Dark pink button background */
     color: white;
     border-radius: 20px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 .Send-msg-area button:hover {
-    background-color: #ffbbd3;
+    background-color: #a94e78; /* Lighter pink on hover */
 }
