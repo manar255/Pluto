@@ -8,9 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signUp = void 0;
+exports.signIn = exports.signUp = void 0;
 const Index_1 = require("../Models/Index");
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const { query, validationResult } = require('express-validator');
+require('dotenv').config();
 const signUp = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
@@ -20,7 +27,16 @@ const signUp = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         if (!imageUrl) {
             return res.status(400).json({ message: 'Please upload an image' });
         }
-        const user = new Index_1.User({ fName, lName, userName, password, imageUrl });
+        // Check if user exists
+        const userExists = yield Index_1.User.findOne({ where: { userName } });
+        if (userExists) {
+            return res.status(400).json({ message: 'User already exists' });
+        }
+        // Hash password
+        const salt = yield bcryptjs_1.default.genSalt(10);
+        const hashedPassword = yield bcryptjs_1.default.hash(password, salt);
+        // Create user
+        const user = new Index_1.User({ fName, lName, userName, password: hashedPassword, imageUrl });
         yield user.save();
         res.status(201).json({ message: "User Created Successfully", user });
     }
@@ -30,3 +46,27 @@ const signUp = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.signUp = signUp;
+const signIn = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let { userName, password } = req.body;
+        // Check if user exists
+        const user = yield Index_1.User.findOne({ where: { userName } });
+        if (!user) {
+            return res.status(400).json({ message: 'User does not exist' });
+        }
+        // Check if password is correct
+        const isPasswordCorrect = yield bcryptjs_1.default.compare(password, user.password);
+        if (!isPasswordCorrect) {
+            return res.status(400).json({ message: 'Password is incorrect' });
+        }
+        // Create and assign token
+        const token = yield jsonwebtoken_1.default.sign({ userId: user.id, userName: user.userName }, "more super secret key");
+        // Return user
+        res.status(200).json({ message: 'User Signed In Successfully', token });
+    }
+    catch (err) {
+        console.log(err);
+        next(err);
+    }
+});
+exports.signIn = signIn;

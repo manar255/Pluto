@@ -58,6 +58,7 @@ input[type=password] {
     border-radius: 12px;
     padding: 5px;
     color: #6a6565;
+    margin-bottom: 20px;
 }
 
 .form-contaner  input[type = submit]{
@@ -70,6 +71,7 @@ input[type=password] {
     color: #FFFFFF;
     font-size: 17px;
     margin: 0 auto; /* Center the button */
+    margin-top: 30px;
    
 }
 .form-contaner input[type=submit]:hover {
