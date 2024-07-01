@@ -1,5 +1,7 @@
 import { Sequelize, DataTypes, Model, Optional } from "sequelize";
 
+import  {Chat} from"./Index"
+
 // Define the attributes and their types
 interface UserAttributes {
   id: number;
@@ -26,6 +28,10 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+
+  public getFriends!: () => Promise<User[]>;
+  public addFriend!: (friend: User) => Promise<void>;
+  public getChats!:()=>Promise<typeof Chat[]>;
 }
 
 export default (db: Sequelize) => {

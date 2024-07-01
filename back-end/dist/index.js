@@ -32,6 +32,8 @@ const cors_1 = __importDefault(require("cors"));
 const dotenv = __importStar(require("dotenv"));
 const database_1 = __importDefault(require("./config/database"));
 const auth_1 = __importDefault(require("./Routers/auth"));
+const user_1 = __importDefault(require("./Routers/user"));
+const chat_1 = __importDefault(require("./Routers/chat"));
 const port = process.env.PORT || 5000;
 dotenv.config();
 const app = (0, express_1.default)();
@@ -43,6 +45,9 @@ app.get('/', (req, res) => {
 });
 //router
 app.use('/api/auth', auth_1.default);
+app.use('/api/user', user_1.default);
+app.use('/api/chat', chat_1.default);
+//Error handling 
 const errorHandler = (error, req, res, next) => {
     console.error(error);
     const status = error.statusCode || 500;

@@ -17,12 +17,14 @@ const Message = (0, Message_1.default)(database_1.default);
 exports.Message = Message;
 // Define associations
 User.hasMany(Message, { foreignKey: 'senderId' });
-Message.belongsTo(User, { foreignKey: 'senderId' });
-Chat.hasMany(Message, { foreignKey: 'chatId' });
-Message.belongsTo(Chat, { foreignKey: 'chatId' });
-Chat.belongsToMany(User, { through: 'ChatParticipants' });
-User.belongsToMany(Chat, { through: 'ChatParticipants' });
+Message.belongsTo(User, { foreignKey: 'senderId', as: 'Sender' });
+Chat.hasMany(Message, { foreignKey: 'chatId', as: 'Messages' });
+Message.belongsTo(Chat, { foreignKey: 'chatId', as: 'Chat' });
+Chat.belongsToMany(User, { through: 'ChatParticipants', as: 'Users', foreignKey: 'chatId', otherKey: 'userId' });
+User.belongsToMany(Chat, { through: 'ChatParticipants', as: 'Chats', foreignKey: 'userId', otherKey: 'chatId' });
+// Define associations
 User.belongsToMany(User, { through: 'UserFriends', as: 'Friends', foreignKey: 'userId', otherKey: 'friendId' });
+User.belongsToMany(User, { through: 'UserFriends', as: 'FriendOf', foreignKey: 'friendId', otherKey: 'userId' });
 // Sync models with the database
 database_1.default.sync({ force: false })
     .then(() => {

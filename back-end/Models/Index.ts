@@ -12,15 +12,19 @@ const Message = messageModel(db);
 
 // Define associations
 User.hasMany(Message, { foreignKey: 'senderId' });
-Message.belongsTo(User, { foreignKey: 'senderId' });
+Message.belongsTo(User, { foreignKey: 'senderId' ,as: 'Sender'});
 
-Chat.hasMany(Message, { foreignKey: 'chatId' });
-Message.belongsTo(Chat, { foreignKey: 'chatId' });
+Chat.hasMany(Message, { foreignKey: 'chatId' ,as: 'Messages'});
+Message.belongsTo(Chat, { foreignKey: 'chatId' ,as: 'Chat'  });
 
-Chat.belongsToMany(User, { through: 'ChatParticipants' });
-User.belongsToMany(Chat, { through: 'ChatParticipants' });
+Chat.belongsToMany(User, { through: 'ChatParticipants', as: 'Users', foreignKey: 'chatId', otherKey: 'userId' });
+User.belongsToMany(Chat, { through: 'ChatParticipants', as: 'Chats', foreignKey: 'userId', otherKey: 'chatId' });
 
-User.belongsToMany(User,{ through: 'UserFriends', as: 'Friends', foreignKey: 'userId', otherKey: 'friendId' });
+
+// Define associations
+User.belongsToMany(User, { through: 'UserFriends', as: 'Friends', foreignKey: 'userId', otherKey: 'friendId' });
+User.belongsToMany(User, { through: 'UserFriends', as: 'FriendOf', foreignKey: 'friendId', otherKey: 'userId' });
+
 
 // Sync models with the database
 db.sync({ force: false })

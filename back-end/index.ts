@@ -3,8 +3,11 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
 import db from './config/database';
+import CustomError from'./types/customError'
 
 import authRouter from './Routers/auth';
+import userRouter from './Routers/user';
+import chatRouter from './Routers/chat';
 
 const port = process.env.PORT || 5000;
 
@@ -24,12 +27,10 @@ app.get('/', (req, res) => {
 
 //router
 app.use('/api/auth', authRouter);
-
+app.use('/api/user', userRouter);
+app.use('/api/chat', chatRouter);
 
 //Error handling 
-interface CustomError extends Error {
-    statusCode?: number;
-}
 
 const errorHandler = (error: CustomError, req: Request, res: Response, next: NextFunction) => {
     console.error(error);

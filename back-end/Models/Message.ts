@@ -13,7 +13,7 @@ interface MessageCreationAttributes extends Optional<MessageAttributes, 'id'> {}
 class Message extends Model<MessageAttributes,MessageCreationAttributes> implements MessageAttributes {
   public id!: number;
   public content!: string;
-
+  
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
