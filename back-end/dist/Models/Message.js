@@ -12,6 +12,10 @@ exports.default = (db) => {
             autoIncrement: true
         },
         content: sequelize_1.DataTypes.STRING,
+        senderId: {
+            type: sequelize_1.DataTypes.INTEGER,
+            allowNull: false // Assuming senderId cannot be null
+        }
     }, {
         sequelize: db, // passing the `sequelize` instance is required
         modelName: 'Message',

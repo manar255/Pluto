@@ -132,7 +132,16 @@ header .user {
 .card-data .right {
     margin-right: 70px;
 }
-
+/* welcome */
+.welcome {
+    flex: 70%;
+    background-color: #5e2750; /* Dark pink for chat area */
+    border-radius: 30px;
+    height: 620px;
+    margin: 20px;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 /* Chat area */
 .chat {
     flex: 70%;
@@ -143,6 +152,7 @@ header .user {
     position: relative;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
 
 .chat-header {
     display: flex;

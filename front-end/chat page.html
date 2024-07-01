@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=Chat, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- <link href="/front-end/main.css" rel="stylesheet" /> -->
     <link href="/front-end/chat page.css" rel="stylesheet" />
     <!-- Add Font Awesome -->
@@ -44,32 +44,29 @@
                         <p class="time">2:25 PM</p>
                     </div>
                 </div>
-                <div class="chat-card">
-                    <img src="/front-end//util/myPhoto1.jpg" width=50 height="50" />
-                    <div class="card-data">
-                        <div class="right">
-                            <h4 class="name">full Name</h4>
-                            <p class="msg">last Message</p>
-                        </div>
-                        <p class="time">2:25 PM</p>
-                    </div>
-                </div>
-                <div class="chat-card">
-                    <img src="/front-end//util/myPhoto1.jpg" width=50 height="50" />
-                    <div class="card-data">
-                        <div class="right">
-                            <h4 class="name">full Name</h4>
-                            <p class="msg">last Message</p>
-                        </div>
-                        <p class="time">2:25 PM</p>
+            </div>
+        </div>
+        <div class="welcome ">
+            <p>Welcome Manar Khaled in Pluto chat app.</p>
+        </div>
+        <div class="chat" style="display: none;">
+            <div class="chat-header">
+                <div class="user-info">
+                    <img src="/front-end//util/myPhoto1.jpg" width="50" height="50"/>
+                    <div class="user-name">
+                        <h4>full Name</h4>
                     </div>
                 </div>
             </div>
+            <div class="messages">
+                <!-- Messages will be dynamically added here -->
+            </div>
+            <div class="Send-msg-area">
+                <input type="text" class="messageInput" placeholder="Type your message here...">
+                <button>Send</button>
+            </div>
         </div>
-        <!-- <div class="Welcome">
-            <p>Welcome Manar Khaled in Pluto chat app.</p>
-        </div> -->
-        <div class="chat">
+        <!-- <div class="chat">
             <div class="chat-header">
                 <div class="user-info">
                     <img src="/front-end//util/myPhoto1.jpg" width=50 height="50"/>
@@ -97,9 +94,9 @@
                 <input type="text" placeholder="Type your message here...">
                 <button>Send</button>
             </div>
-        </div>
+        </div> -->
     </div>
-
+<script src="/front-end/chat page.js"></script>
 </body>
 
 </html>

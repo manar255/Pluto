@@ -90,7 +90,7 @@ const getMessages = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
                             attributes: ['id', 'username']
                         }
                     ],
-                    order: [['createdAt', 'DESC']],
+                    // order: [['createdAt', 'ASC']]
                 },
                 {
                     model: Index_1.User,
@@ -114,14 +114,16 @@ const sendMessage = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     try {
         const userId = req.userId;
         const chatId = req.params.chatId;
-        const content = req.body.message;
+        const content = req.body.content;
         if (!chatId) {
             throw new customErrorClass_1.default('Chat not found', 400);
         }
         // Create new message
         const newMessage = yield Index_1.Message.create({
             content,
+            senderId: userId,
         });
+        //add sender
         // Add message to chat
         const chat = yield Index_1.Chat.findByPk(chatId);
         yield (chat === null || chat === void 0 ? void 0 : chat.addMessage(newMessage));

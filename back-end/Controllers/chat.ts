@@ -81,7 +81,7 @@ const getMessages = async (req: Request, res: Response, next: NextFunction) => {
                             attributes: ['id', 'username']
                         }
                     ],
-                    order: [['createdAt', 'DESC']],
+                    // order: [['createdAt', 'ASC']]
                 },
                 {
                     model: User,
@@ -107,14 +107,19 @@ const sendMessage = async (req: Request, res: Response, next: NextFunction) => {
     try {
        const userId:any = req.userId;
        const chatId = req.params.chatId;
-       const content:any = req.body.message;
+       const content:any = req.body.content;
         if (!chatId) {
             throw new CustomErrorClass('Chat not found', 400);
             }
            // Create new message
         const newMessage = await Message.create({
             content,
+            senderId: userId,
         });
+        //add sender
+        
+        
+        
         // Add message to chat
        const chat = await Chat.findByPk(chatId);
        await chat?.addMessage(newMessage);
