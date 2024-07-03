@@ -11,7 +11,7 @@ const Message = messageModel(db);
 
 
 // Define associations
-User.hasMany(Message, { foreignKey: 'senderId' });
+User.hasMany(Message, { as: 'SentMessages', foreignKey: 'senderId' });
 Message.belongsTo(User, { foreignKey: 'senderId' ,as: 'Sender'});
 
 Chat.hasMany(Message, { foreignKey: 'chatId' ,as: 'Messages'});

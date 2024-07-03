@@ -40,7 +40,7 @@ const getUserChats = async (req: Request, res: Response, next: NextFunction) => 
                             include: [
                                 {
                                     model: User,
-                                    as: 'Sender',
+                                   as: 'Sender',
                                     attributes: ['id', 'username'] // Adjust attributes as per your requirements
                                 }
                             ],

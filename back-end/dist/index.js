@@ -30,24 +30,45 @@ const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv = __importStar(require("dotenv"));
+const http_1 = __importDefault(require("http"));
+const socket_io_1 = require("socket.io");
 const database_1 = __importDefault(require("./config/database"));
+const path_1 = __importDefault(require("path"));
 const auth_1 = __importDefault(require("./Routers/auth"));
 const user_1 = __importDefault(require("./Routers/user"));
 const chat_1 = __importDefault(require("./Routers/chat"));
-const port = process.env.PORT || 5000;
 dotenv.config();
 const app = (0, express_1.default)();
+app.use(express_1.default.static(path_1.default.join(__dirname, 'public')));
+const server = http_1.default.createServer(app);
+const io = new socket_io_1.Server(server, {
+    cors: {
+        origin: "*", // Adjust this to your needs
+        methods: ["GET", "POST"]
+    }
+});
+const port = process.env.PORT || 5000;
 app.use(body_parser_1.default.urlencoded({ extended: false }));
 app.use(body_parser_1.default.json());
 app.use((0, cors_1.default)());
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
-//router
+// Routers
 app.use('/api/auth', auth_1.default);
 app.use('/api/user', user_1.default);
 app.use('/api/chat', chat_1.default);
-//Error handling 
+// Socket.IO setup
+io.on('connection', (socket) => {
+    console.log('a user connected');
+    socket.on('chat message', data => {
+        io.emit('chat message', data);
+    });
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    });
+});
+// Error handling
 const errorHandler = (error, req, res, next) => {
     console.error(error);
     const status = error.statusCode || 500;
@@ -55,7 +76,7 @@ const errorHandler = (error, req, res, next) => {
     res.status(status).json({ message });
 };
 app.use(errorHandler);
-//database connection
+// Database connection
 database_1.default.authenticate()
     .then(() => {
     console.log('Database connected');
@@ -63,6 +84,6 @@ database_1.default.authenticate()
     .catch(error => {
     console.error('Error syncing database', error);
 });
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`App listening on port ${port}!`);
 });

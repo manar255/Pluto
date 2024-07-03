@@ -181,10 +181,14 @@ header .user {
 }
 
 .messages {
+    flex-grow: 1; /* Allow the messages container to grow */
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    overflow-y: auto; /* Enable vertical scrolling */
+    max-height: calc(100vh - 200px); /* Adjust this value based on your header and input height */
+    height: 490px;
 }
 
 .send-message,
@@ -210,7 +214,7 @@ header .user {
     display: flex;
     border-top: 1px solid #dddddd; /* Light gray border */
     padding: 10px;
-    position: absolute;
+    /* position: absolute; */
     bottom: 0px;
     left: 0;
     right: 0;

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link href="/front-end/main.css" rel="stylesheet" /> -->
+    <link href="/front-end/chat page.css" rel="stylesheet" />
+    <!-- Add Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <title>Pluto</title>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img src="/front-end/util/Pluto.png" width=50 height="50">
+            <h1>Pluto</h1>
+        </div>
+        <div class="user">
+            <img src="/front-end//util/myPhoto1.jpg" width=50 height="50">
+            <h5>
+                Manar Khaled
+            </h5>
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </div>
+
+    </header>
+    <div class="chat-area">
+        <div class="chats">
+            <div class="search">
+
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="chat-cards">
+                <!-- <div class="chat-card">
+                    <img src="/front-end//util/myPhoto1.jpg" width=50 height="50" />
+                    <div class="card-data">
+                        <div class="right">
+                            <h4 class="name">full Name</h4>
+                            <p class="msg">last Message</p>
+                        </div>
+                        <p class="time">2:25 PM</p>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+        <div class="welcome ">
+            <p>Welcome Manar Khaled in Pluto chat app.</p>
+        </div>
+        <div class="chat" style="display: none;">
+            <div class="chat-header">
+                <div class="user-info">
+                    <img src="/front-end//util/myPhoto1.jpg" width="50" height="50" />
+                    <div class="user-name">
+                        <h4>full Name</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="messages">
+                <!-- Messages will be dynamically added here -->
+            </div>
+            <div class="Send-msg-area">
+                <input type="text" class="messageInput" placeholder="Type your message here...">
+                <button>Send</button>
+            </div>
+        </div>
+        <!-- <div class="chat">
+            <div class="chat-header">
+                <div class="user-info">
+                    <img src="/front-end//util/myPhoto1.jpg" width=50 height="50"/>
+                    <div class="user-name">
+                        <h4>full Name</h4>
+                    </div>
+
+                </div>
+            </div>
+            <div class="messages">
+                <div class="send-message">
+                    <p>Hello!</p>
+                </div>
+                <div class="send-message">
+                    <p>how are you</p>
+                </div>
+                <div class="receive-message">
+                    <p>Hi Manar</p>
+                </div>
+                <div class="receive-message">
+                    <p>I'm fine and you?</p>
+                </div>
+            </div>
+            <div class="Send-msg-area">
+                <input type="text" placeholder="Type your message here...">
+                <button>Send</button>
+            </div>
+        </div> -->
+    </div>
+
+
+    <script src="/front-end/chat page.js"></script>
+    <script type="module">
+        import { Manager } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
+        const manager = new Manager("http://localhost:8080");
+
+        const socket = manager.socket("/");
+
+        socket.on("connect", () => {
+            console.log("connected to server");
+            socket.emit("join", { username: "Manar" });
+        });
+        socket.on('chat message', (data) => {
+            const messagesContainer = document.querySelector('.messages');
+            const messageElement = document.createElement('div');
+            // console.log(id,socket.id)
+
+            if (socket.id == data.id) {
+                messageElement.classList.add('send-message');
+            }
+            else {
+                messageElement.classList.add('receive-message');
+            }
+            messageElement.innerHTML = `<p>${data.msg}</p>`;
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        });
+        const token = localStorage.getItem('token');
+
+        const sendButton = document.querySelector('button');
+
+        function sendMessage(chatId, messageContent) {
+            fetch(`http://localhost:8080/api/chat/sendMessage/${chatId}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    content: messageContent
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to send message');
+                    }
+                    // Handle success if needed
+                })
+                .catch(error => {
+                    console.error('Error sending message:', error);
+                });
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('http://localhost:8080/api/user/userInfo', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const user =data.data;
+                const userElement = document.querySelector('.user');
+                const userImage = userElement.querySelector('img');
+                const userName = userElement.querySelector('h5');
+                
+                userImage.src = `/back-end/${user.imageUrl}`;
+                userName.innerHTML = `${user.fName} ${user.lName}`;
+            })
+            .catch(error => {
+                console.error('Error fetching user info:', error);
+            });
+            // Fetching data from API
+            fetch('http://localhost:8080/api/chat/getUserChats', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const chatsContainer = document.querySelector('.chat-cards');
+
+                    // Assuming 'data' is your API response JSON
+                    data.user.Chats.forEach(chat => {
+                        const chatCard = document.createElement('div');
+                        chatCard.classList.add('chat-card');
+
+                        chatCard.innerHTML = `
+                <img src="/back-end/${chat.Users[0].imageUrl}" width="50" height="50" />
+                <div class="card-data">
+                    <div class="right">
+                        <h4 class="name">${chat.Users[0].fName} ${chat.Users[0].lName}</h4>
+                        <p class="msg">${chat.Messages.length > 0 ? chat.Messages[0].content : ''}</p>
+                    </div>
+                    
+                    <p class="time">${chat.Messages.length > 0 ? new Date(chat.Messages[0].createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</p>
+
+                </div>
+            `;
+
+                        chatsContainer.appendChild(chatCard);
+
+                        // Add click event listener to each chat card
+                        chatCard.addEventListener('click', () => {
+                            // Fetch messages for this chat
+                            fetch(`http://localhost:8080/api/chat/getMessages/${chat.id}`, {
+                                headers: {
+                                    'Authorization': `Bearer ${token}`
+                                }
+                            })
+                                .then(response => response.json())
+                                .then(messagesData => {
+                                    const messagesContainer = document.querySelector('.messages');
+                                    messagesContainer.innerHTML = ''; // Clear previous messages
+
+                                    //sort messages
+                                    messagesData.chat.Messages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                                    // Assuming 'messagesData' is your messages API response JSON
+                                    messagesData.chat.Messages.forEach(message => {
+                                        const messageElement = document.createElement('div');
+                                        //TODO:
+                                        if (chat.Users[0].id == message.Sender.id) {
+                                            messageElement.classList.add('receive-message');
+                                        } else {
+                                            messageElement.classList.add('send-message');
+                                        }
+                                        //messageElement.classList.add('receive-message');
+                                        messageElement.innerHTML = `<p>${message.content}</p>`;
+                                        messagesContainer.appendChild(messageElement);
+                                    });
+
+                                    // Show chat area and hide welcome message
+                                    document.querySelector('.welcome').style.display = 'none';
+
+                                    const chatContainer = document.querySelector('.chat');
+                                    chatContainer.style.display = 'block';
+                                    const userInfo = chatContainer.querySelector('.user-info');
+                                    const userImage = userInfo.querySelector('img');
+                                    const userNameElement = userInfo.querySelector('.user-name h4');
+                                    userImage.src = `/back-end/${chat.Users[0].imageUrl}`;
+                                    userNameElement.textContent = `${chat.Users[0].fName} ${chat.Users[0].lName}`;
+
+
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching messages:', error);
+                                });
+                        });
+                        sendButton.addEventListener('click', () => {
+                            const messageInput = document.querySelector('.messageInput');
+                            const messageContent = messageInput.value.trim();
+                            const chatId = chat.id;
+
+                            if (messageContent) {
+                                socket.emit('chat message', { msg: messageContent, id: socket.id });
+                                sendMessage(chatId, messageContent);
+
+                                messageInput.value = ''; // Clear input field after sending
+                            }
+                        });
+
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        });
+
+
+    </script>
+
+
+
+
+
+
+</body>
+
+</html>

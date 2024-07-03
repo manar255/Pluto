@@ -16,7 +16,7 @@ exports.Chat = Chat;
 const Message = (0, Message_1.default)(database_1.default);
 exports.Message = Message;
 // Define associations
-User.hasMany(Message, { foreignKey: 'senderId' });
+User.hasMany(Message, { as: 'SentMessages', foreignKey: 'senderId' });
 Message.belongsTo(User, { foreignKey: 'senderId', as: 'Sender' });
 Chat.hasMany(Message, { foreignKey: 'chatId', as: 'Messages' });
 Message.belongsTo(Chat, { foreignKey: 'chatId', as: 'Chat' });

@@ -14,7 +14,11 @@ exports.default = (db) => {
         content: sequelize_1.DataTypes.STRING,
         senderId: {
             type: sequelize_1.DataTypes.INTEGER,
-            allowNull: false // Assuming senderId cannot be null
+            allowNull: false,
+            references: {
+                model: 'Users',
+                key: 'id'
+            }
         }
     }, {
         sequelize: db, // passing the `sequelize` instance is required

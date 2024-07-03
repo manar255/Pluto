@@ -19,7 +19,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
             alert(data.message);
             localStorage.setItem('token', data.token);
             // Optionally, redirect the user to another page
-            window.location.href = '/front-end/chat page.html';
+            window.location.href = '/front-end/index.js';
         } else {
             alert('Login failed: ' + (data.message || 'Unknown error'));
         }

@@ -12,10 +12,64 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addFriend = exports.getAllFriend = void 0;
+exports.searchUser = exports.getUser = exports.addFriend = exports.getAllFriend = void 0;
 const Index_1 = require("../Models/Index");
 const customErrorClass_1 = __importDefault(require("../types/customErrorClass"));
+const sequelize_1 = require("sequelize");
 require('dotenv').config();
+const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = req.userId;
+        if (!userId) {
+            const err = new customErrorClass_1.default('Unauthorized access', 401);
+            throw err;
+        }
+        const user = yield Index_1.User.findByPk(userId, {
+            attributes: ['id', 'fName', 'lName', 'userName', 'imageUrl'],
+        });
+        if (!user) {
+            const err = new customErrorClass_1.default('User not found', 404);
+            throw err;
+        }
+        res.status(200).json({
+            status: 'success',
+            data: user,
+        });
+    }
+    catch (err) {
+        console.log('error in getting user data');
+        next(err);
+    }
+});
+exports.getUser = getUser;
+const searchUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = req.userId;
+        const { query } = req.params;
+        const users = yield Index_1.User.findAll({
+            where: {
+                [sequelize_1.Op.or]: [
+                    { userName: { [sequelize_1.Op.like]: `%${query}%` } },
+                    { fName: { [sequelize_1.Op.like]: `%${query}%` } }
+                ]
+            },
+            attributes: ['id', 'fName', 'lName', 'userName', 'imageUrl'],
+        });
+        if (!users) {
+            const err = new customErrorClass_1.default('User not found', 404);
+            throw err;
+        }
+        res.status(200).json({
+            status: 'success',
+            data: users,
+        });
+    }
+    catch (err) {
+        console.log('error in getting user data');
+        next(err);
+    }
+});
+exports.searchUser = searchUser;
 const getAllFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.userId;

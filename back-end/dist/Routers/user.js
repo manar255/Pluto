@@ -8,6 +8,8 @@ const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
 const user_1 = require("../Controllers/user");
 const isAuth_1 = __importDefault(require("../Middlewares/isAuth"));
+router.get('/userInfo', isAuth_1.default, user_1.getUser);
+router.get('/searchUser/:query', isAuth_1.default, user_1.searchUser);
 router.get('/getAllFriends', isAuth_1.default, user_1.getAllFriend);
 router.put('/addFriend/:friendId', isAuth_1.default, user_1.addFriend);
 exports.default = router;

@@ -1,9 +1,66 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, query } from "express";
 import { User ,Chat} from "../Models/Index";
 import CustomErrorClass from '../types/customErrorClass'
+import { Op } from 'sequelize';
 
 require('dotenv').config();
 
+const getUser =  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = req.userId;
+
+        if (!userId) {
+            const err = new CustomErrorClass('Unauthorized access', 401);
+            throw err;
+        }
+
+        const user = await User.findByPk(userId,{
+            attributes: ['id', 'fName', 'lName','userName','imageUrl'],
+        });
+        if (!user) {
+            const err = new CustomErrorClass('User not found', 404);
+            throw err;
+        }
+
+        res.status(200).json({
+            status: 'success',
+            data: user,
+            });
+
+
+    } catch (err) {
+        console.log('error in getting user data');
+        next(err);
+    }
+};
+const searchUser =  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = req.userId;
+
+        const {query} = req.params;
+
+        const users = await User.findAll({
+            where: {
+                [Op.or]: [
+                    { userName: { [Op.like]: `%${query}%` } },
+                    { fName: { [Op.like]: `%${query}%` } }
+                ]
+            },
+            attributes: ['id', 'fName', 'lName','userName','imageUrl'],
+        });
+        if (!users) {
+            const err = new CustomErrorClass('User not found', 404);
+            throw err;
+            }
+            res.status(200).json({
+                status: 'success',
+                data: users,
+                });
+    } catch (err) {
+        console.log('error in getting user data');
+        next(err);
+    }
+};
 const getAllFriend = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userId = req.userId;
@@ -81,4 +138,4 @@ const addFriend = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
-export { getAllFriend , addFriend };
+export { getAllFriend , addFriend ,getUser,searchUser};
