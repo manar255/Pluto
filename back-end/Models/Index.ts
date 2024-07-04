@@ -3,11 +3,14 @@ import userModel from './User';
 import chatModel from './Chat';
 import messageModel from './Message';
 
+
 import db from '../config/database'
 
 const User = userModel(db);
 const Chat = chatModel(db);
 const Message = messageModel(db);
+
+
 
 
 // Define associations

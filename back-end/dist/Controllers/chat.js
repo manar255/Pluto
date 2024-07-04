@@ -47,13 +47,13 @@ const getUserChats = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
                             model: Index_1.Message,
                             as: 'Messages',
                             attributes: ['id', 'content', 'createdAt'], // Adjust attributes as per your requirements
-                            include: [
-                                {
-                                    model: Index_1.User,
-                                    as: 'Sender',
-                                    attributes: ['id', 'username'] // Adjust attributes as per your requirements
-                                }
-                            ],
+                            // include: [
+                            //     {
+                            //         model: User,
+                            //         as: 'Sender',
+                            //         attributes: ['id', 'username'] // Adjust attributes as per your requirements
+                            //     }
+                            // ],
                             order: [['createdAt', 'DESC']], // Order messages by createdAt DESC to get the last message
                             limit: 1 // Limit to 1 message to get the last message only
                         }

@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction, query } from "express";
-import { User ,Chat} from "../Models/Index";
+import { User, Chat } from "../Models/Index";
 import CustomErrorClass from '../types/customErrorClass'
 import { Op } from 'sequelize';
 
 require('dotenv').config();
 
-const getUser =  async (req: Request, res: Response, next: NextFunction) => {
+const getUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userId = req.userId;
 
@@ -14,8 +14,8 @@ const getUser =  async (req: Request, res: Response, next: NextFunction) => {
             throw err;
         }
 
-        const user = await User.findByPk(userId,{
-            attributes: ['id', 'fName', 'lName','userName','imageUrl'],
+        const user = await User.findByPk(userId, {
+            attributes: ['id', 'fName', 'lName', 'userName', 'imageUrl'],
         });
         if (!user) {
             const err = new CustomErrorClass('User not found', 404);
@@ -25,7 +25,7 @@ const getUser =  async (req: Request, res: Response, next: NextFunction) => {
         res.status(200).json({
             status: 'success',
             data: user,
-            });
+        });
 
 
     } catch (err) {
@@ -33,11 +33,15 @@ const getUser =  async (req: Request, res: Response, next: NextFunction) => {
         next(err);
     }
 };
-const searchUser =  async (req: Request, res: Response, next: NextFunction) => {
+const searchUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userId = req.userId;
 
-        const {query} = req.params;
+        const { query } = req.params;
+
+        const current_user = await User.findByPk(userId);
+        const userFriends=await current_user?.getFriends(); 
+        const userFriendsIds=userFriends?.map((friend)=>friend.id)
 
         const users = await User.findAll({
             where: {
@@ -46,16 +50,31 @@ const searchUser =  async (req: Request, res: Response, next: NextFunction) => {
                     { fName: { [Op.like]: `%${query}%` } }
                 ]
             },
-            attributes: ['id', 'fName', 'lName','userName','imageUrl'],
+            attributes: ['id', 'fName', 'lName', 'userName', 'imageUrl'],
+            limit: 10,
+           
         });
-        if (!users) {
-            const err = new CustomErrorClass('User not found', 404);
-            throw err;
-            }
-            res.status(200).json({
-                status: 'success',
-                data: users,
-                });
+
+        const users_data = users.map(user => {
+            //if user is friend to current friend
+            const isFriend = userFriendsIds?.includes(user.id);
+            return {
+                id: user.id,
+                fName: user.fName,
+                lName: user.lName,
+                userName: user.userName,
+                imageUrl: user.imageUrl,
+                isFriend: isFriend
+                }
+        })
+        //fliter current user from users data
+        const filtered_users_data = users_data.filter(user => user.id !== current_user?.id);
+        
+
+        res.status(200).json({
+            status: 'success',
+            data:  filtered_users_data ,
+        });
     } catch (err) {
         console.log('error in getting user data');
         next(err);
@@ -77,13 +96,13 @@ const getAllFriend = async (req: Request, res: Response, next: NextFunction) => 
         }
 
         const friends = await user.getFriends();
-        const friends_data =friends.map(friend=>{
+        const friends_data = friends.map(friend => {
             return {
                 id: friend.id,
                 fName: friend.fName,
                 lName: friend.lName,
-                userName:friend.userName,
-                imageUrl:friend.imageUrl
+                userName: friend.userName,
+                imageUrl: friend.imageUrl
 
             }
         })
@@ -125,12 +144,12 @@ const addFriend = async (req: Request, res: Response, next: NextFunction) => {
             throw err;
         }
         await user.addFriend(friend);
-        await friend.addFriend(user); 
+        await friend.addFriend(user);
 
         //add chat
         const chat = await Chat.create({});
-        await chat.addUsers([user,friend]);
-        res.status(200).json({ message: "Success in adding friend" });    
+        await chat.addUsers([user, friend]);
+        res.status(200).json({ message: "Success in adding friend" });
 
     } catch (err) {
         console.error('Error add friend:', err);
@@ -138,4 +157,4 @@ const addFriend = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
-export { getAllFriend , addFriend ,getUser,searchUser};
+export { getAllFriend, addFriend, getUser, searchUser };

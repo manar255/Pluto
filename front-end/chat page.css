@@ -85,6 +85,48 @@ header .user {
     outline: none;
     border: none;
 }
+.search-results {
+    width: 350px;
+    background-color: #5e2750; /* Dark pink for search results */
+    border-radius: 20px;
+    margin-top: 20px;
+    padding: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.search-result {
+    display: flex;
+    border-bottom: 2px solid #6e386c; /* Lighter pink border */
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.search-result img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.search-result .result-data {
+    display: flex;
+    flex-direction: column;
+    color: #FFFFFF;
+}
+
+.search-result h4 {
+    font-size: 20px;
+    margin: 0;
+    color: #FFFFFF;
+}
+
+.search-result p {
+    margin: 5px 0 0 0;
+    color: #cccccc;
+}
 
 .chat-cards {
     width: 350px;

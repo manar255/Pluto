@@ -46,6 +46,9 @@ const searchUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     try {
         const userId = req.userId;
         const { query } = req.params;
+        const current_user = yield Index_1.User.findByPk(userId);
+        const userFriends = yield (current_user === null || current_user === void 0 ? void 0 : current_user.getFriends());
+        const userFriendsIds = userFriends === null || userFriends === void 0 ? void 0 : userFriends.map((friend) => friend.id);
         const users = yield Index_1.User.findAll({
             where: {
                 [sequelize_1.Op.or]: [
@@ -54,14 +57,25 @@ const searchUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 ]
             },
             attributes: ['id', 'fName', 'lName', 'userName', 'imageUrl'],
+            limit: 10,
         });
-        if (!users) {
-            const err = new customErrorClass_1.default('User not found', 404);
-            throw err;
-        }
+        const users_data = users.map(user => {
+            //if user is friend to current friend
+            const isFriend = userFriendsIds === null || userFriendsIds === void 0 ? void 0 : userFriendsIds.includes(user.id);
+            return {
+                id: user.id,
+                fName: user.fName,
+                lName: user.lName,
+                userName: user.userName,
+                imageUrl: user.imageUrl,
+                isFriend: isFriend
+            };
+        });
+        //fliter current user from users data
+        const filtered_users_data = users_data.filter(user => user.id !== (current_user === null || current_user === void 0 ? void 0 : current_user.id));
         res.status(200).json({
             status: 'success',
-            data: users,
+            data: filtered_users_data,
         });
     }
     catch (err) {

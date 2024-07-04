@@ -18,40 +18,31 @@
             <h1>Pluto</h1>
         </div>
         <div class="user">
-            <img src="/front-end//util/myPhoto1.jpg" width=50 height="50">
+            <img src="/front-end/util/user.jpeg" width=50 height="50">
             <h5>
-                Manar Khaled
+                Your Name
             </h5>
             <i class="fa-solid fa-arrow-right-from-bracket"></i>
         </div>
-
     </header>
     <div class="chat-area">
         <div class="chats">
             <div class="search">
-
                 <input type="text" placeholder="Search...">
+                <div class="search-results" style="display: none;"></div> <!-- Initially hidden -->
             </div>
             <div class="chat-cards">
-                <!-- <div class="chat-card">
-                    <img src="/front-end//util/myPhoto1.jpg" width=50 height="50" />
-                    <div class="card-data">
-                        <div class="right">
-                            <h4 class="name">full Name</h4>
-                            <p class="msg">last Message</p>
-                        </div>
-                        <p class="time">2:25 PM</p>
-                    </div>
-                </div> -->
+
             </div>
+
         </div>
-        <div class="welcome ">
+        <div class="welcome">
             <p>Welcome Manar Khaled in Pluto chat app.</p>
         </div>
         <div class="chat" style="display: none;">
             <div class="chat-header">
                 <div class="user-info">
-                    <img src="/front-end//util/myPhoto1.jpg" width="50" height="50" />
+                    <img src="/front-end/util/user1.png" width="50" height="50" />
                     <div class="user-name">
                         <h4>full Name</h4>
                     </div>
@@ -65,37 +56,7 @@
                 <button>Send</button>
             </div>
         </div>
-        <!-- <div class="chat">
-            <div class="chat-header">
-                <div class="user-info">
-                    <img src="/front-end//util/myPhoto1.jpg" width=50 height="50"/>
-                    <div class="user-name">
-                        <h4>full Name</h4>
-                    </div>
-
-                </div>
-            </div>
-            <div class="messages">
-                <div class="send-message">
-                    <p>Hello!</p>
-                </div>
-                <div class="send-message">
-                    <p>how are you</p>
-                </div>
-                <div class="receive-message">
-                    <p>Hi Manar</p>
-                </div>
-                <div class="receive-message">
-                    <p>I'm fine and you?</p>
-                </div>
-            </div>
-            <div class="Send-msg-area">
-                <input type="text" placeholder="Type your message here...">
-                <button>Send</button>
-            </div>
-        </div> -->
     </div>
-
 
     <script src="/front-end/chat page.js"></script>
     <script type="module">
@@ -108,26 +69,39 @@
             console.log("connected to server");
             socket.emit("join", { username: "Manar" });
         });
+
         socket.on('chat message', (data) => {
             const messagesContainer = document.querySelector('.messages');
             const messageElement = document.createElement('div');
-            // console.log(id,socket.id)
 
-            if (socket.id == data.id) {
+            if (socket.id === data.id) {
                 messageElement.classList.add('send-message');
-            }
-            else {
+            } else {
                 messageElement.classList.add('receive-message');
             }
             messageElement.innerHTML = `<p>${data.msg}</p>`;
             messagesContainer.appendChild(messageElement);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
         });
+
         const token = localStorage.getItem('token');
-
         const sendButton = document.querySelector('button');
+        function sendButtonClick(chatId) {
+            sendButton.addEventListener('click', async () => {
+                const messageInput = document.querySelector('.messageInput');
+                const messageContent = messageInput.value.trim();
 
+
+                if (messageContent) {
+                    socket.emit('chat message', { msg: messageContent, id: socket.id });
+                    await sendMessage(chatId, messageContent);
+                    messageInput.value = ''; // Clear input field after sending
+                }
+            });
+        }
         function sendMessage(chatId, messageContent) {
+            console.log(chatId);
             fetch(`http://localhost:8080/api/chat/sendMessage/${chatId}`, {
                 method: 'POST',
                 headers: {
@@ -149,27 +123,26 @@
                 });
         }
 
-
         document.addEventListener('DOMContentLoaded', () => {
             fetch('http://localhost:8080/api/user/userInfo', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             })
-            .then(response => response.json())
-            .then(data => {
-                const user =data.data;
-                const userElement = document.querySelector('.user');
-                const userImage = userElement.querySelector('img');
-                const userName = userElement.querySelector('h5');
-                
-                userImage.src = `/back-end/${user.imageUrl}`;
-                userName.innerHTML = `${user.fName} ${user.lName}`;
-            })
-            .catch(error => {
-                console.error('Error fetching user info:', error);
-            });
-            // Fetching data from API
+                .then(response => response.json())
+                .then(data => {
+                    const user = data.data;
+                    const userElement = document.querySelector('.user');
+                    const userImage = userElement.querySelector('img');
+                    const userName = userElement.querySelector('h5');
+
+                    userImage.src = `/back-end/${user.imageUrl}`;
+                    userName.innerHTML = `${user.fName} ${user.lName}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching user info:', error);
+                });
+
             fetch('http://localhost:8080/api/chat/getUserChats', {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -178,30 +151,29 @@
                 .then(response => response.json())
                 .then(data => {
                     const chatsContainer = document.querySelector('.chat-cards');
-
-                    // Assuming 'data' is your API response JSON
+                    data.user.Chats.sort((a, b) => new Date(b.Messages[0].createdAt) - new Date(a.Messages[0].createdAt));
                     data.user.Chats.forEach(chat => {
+                        const chatId = chat.id;
+                        
+
                         const chatCard = document.createElement('div');
                         chatCard.classList.add('chat-card');
 
                         chatCard.innerHTML = `
-                <img src="/back-end/${chat.Users[0].imageUrl}" width="50" height="50" />
-                <div class="card-data">
-                    <div class="right">
-                        <h4 class="name">${chat.Users[0].fName} ${chat.Users[0].lName}</h4>
-                        <p class="msg">${chat.Messages.length > 0 ? chat.Messages[0].content : ''}</p>
-                    </div>
-                    
-                    <p class="time">${chat.Messages.length > 0 ? new Date(chat.Messages[0].createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</p>
-
-                </div>
-            `;
+                        <img src="/back-end/${chat.Users[0].imageUrl}" width="50" height="50" />
+                        <div class="card-data">
+                            <div class="right">
+                                <h4 class="name">${chat.Users[0].fName} ${chat.Users[0].lName}</h4>
+                                <p class="msg">${chat.Messages.length > 0 ? chat.Messages[0].content : ''}</p>
+                            </div>
+                            <p class="time">${chat.Messages.length > 0 ? new Date(chat.Messages[0].createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</p>
+                        </div>
+                    `;
 
                         chatsContainer.appendChild(chatCard);
 
-                        // Add click event listener to each chat card
-                        chatCard.addEventListener('click', () => {
-                            // Fetch messages for this chat
+                        chatCard.addEventListener('click', async () => {
+                            
                             fetch(`http://localhost:8080/api/chat/getMessages/${chat.id}`, {
                                 headers: {
                                     'Authorization': `Bearer ${token}`
@@ -209,26 +181,24 @@
                             })
                                 .then(response => response.json())
                                 .then(messagesData => {
+                                    
                                     const messagesContainer = document.querySelector('.messages');
                                     messagesContainer.innerHTML = ''; // Clear previous messages
 
-                                    //sort messages
                                     messagesData.chat.Messages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-                                    // Assuming 'messagesData' is your messages API response JSON
+
                                     messagesData.chat.Messages.forEach(message => {
                                         const messageElement = document.createElement('div');
-                                        //TODO:
-                                        if (chat.Users[0].id == message.Sender.id) {
+
+                                        if (chat.Users[0].id === message.Sender.id) {
                                             messageElement.classList.add('receive-message');
                                         } else {
                                             messageElement.classList.add('send-message');
                                         }
-                                        //messageElement.classList.add('receive-message');
                                         messageElement.innerHTML = `<p>${message.content}</p>`;
                                         messagesContainer.appendChild(messageElement);
                                     });
 
-                                    // Show chat area and hide welcome message
                                     document.querySelector('.welcome').style.display = 'none';
 
                                     const chatContainer = document.querySelector('.chat');
@@ -239,24 +209,14 @@
                                     userImage.src = `/back-end/${chat.Users[0].imageUrl}`;
                                     userNameElement.textContent = `${chat.Users[0].fName} ${chat.Users[0].lName}`;
 
-
+                                    //send message 
+                                    sendButtonClick(chat.id);
                                 })
                                 .catch(error => {
                                     console.error('Error fetching messages:', error);
                                 });
                         });
-                        sendButton.addEventListener('click', () => {
-                            const messageInput = document.querySelector('.messageInput');
-                            const messageContent = messageInput.value.trim();
-                            const chatId = chat.id;
 
-                            if (messageContent) {
-                                socket.emit('chat message', { msg: messageContent, id: socket.id });
-                                sendMessage(chatId, messageContent);
-
-                                messageInput.value = ''; // Clear input field after sending
-                            }
-                        });
 
                     });
                 })
@@ -265,14 +225,92 @@
                 });
         });
 
+        // Search functionality
+        const searchInput = document.querySelector('.search input');
+        const searchResultsContainer = document.querySelector('.search-results');
 
+        searchInput.addEventListener('input', (event) => {
+            const query = event.target.value.trim();
+
+            if (query !== '') {
+                fetch(`http://localhost:8080/api/user/searchUser/${query}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        searchResultsContainer.innerHTML = ''; // Clear previous results
+
+                        if (data.data.length > 0) {
+                            searchResultsContainer.style.display = 'block'; // Show results container
+
+                            data.data.forEach(user => {
+                                const userElement = document.createElement('div');
+                                userElement.classList.add('search-result');
+                                if (user.isFriend) {
+                                    userElement.innerHTML = `
+                            <img src="/back-end/${user.imageUrl}" width="50" height="50" />
+                            <div class="result-data">
+                                <h4>${user.fName} ${user.lName}</h4>
+                                <p>@${user.userName}</p>
+                            </div>
+                        `;
+                                }
+                                else {
+                                    userElement.innerHTML = `
+                                    <img src="/back-end/${user.imageUrl}" width="50" height="50" />
+                                    <div class="result-data">
+                                        <h4>${user.fName} ${user.lName}</h4>
+                                        <p>@${user.userName}</p>
+                                    </div>
+                                    <button class="add-friend-button" data-friend-id="${user.id}">Add Friend</button>
+                                `;
+                                    const addFriendButton = userElement.querySelector('.add-friend-button');
+                                    addFriendButton.addEventListener('click', () => {
+                                        const friendId = addFriendButton.getAttribute('data-friend-id');
+                                        addFriend(friendId);
+                                    });
+                                }
+
+                                searchResultsContainer.appendChild(userElement);
+
+
+
+
+                            });
+                        } else {
+                            searchResultsContainer.style.display = 'none'; // Hide if no results
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching search results:', error);
+                        searchResultsContainer.style.display = 'none'; // Hide on error
+                    });
+            } else {
+                searchResultsContainer.style.display = 'none'; // Hide results container if input is empty
+            }
+        });
+        function addFriend(friendId) {
+            fetch(`http://localhost:8080/api/user/addFriend/${friendId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to add friend');
+                    }
+                    // Handle success if needed
+                    console.log('Friend added successfully');
+                })
+                .catch(error => {
+                    console.error('Error adding friend:', error);
+                });
+        }
     </script>
-
-
-
-
-
-
 </body>
 
 </html>
