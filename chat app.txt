@@ -1,0 +1,32 @@
+chat app:
+
+technology : express - typescript - MySQL.
+
+feature:
+user register with => fName - lName - username - password - imageUrl
+{
+hash password
+valid username
+cloudinary
+}
+user login with => username - password.
+logout
+get all chat.
+search about chat by username.
+send message.
+get all messages.
+add user to friend.
+search user
+edit/delete message.
+
+service:
+socket.io.
+google auth.
+Facebook auth.
+
+Tasks:
+-handle create chat when send new message. => done (:
+-online users & chats order with socket.io.
+-fix UI/UX.
+
+
