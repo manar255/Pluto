@@ -9,6 +9,6 @@ const router = express_1.default.Router();
 const chat_1 = require("../Controllers/chat");
 const isAuth_1 = __importDefault(require("../Middlewares/isAuth"));
 router.get('/getUserChats', isAuth_1.default, chat_1.getUserChats);
+router.post('/sendMessage', isAuth_1.default, chat_1.sendMessage);
 router.get('/getMessages/:chatId', isAuth_1.default, chat_1.getMessages);
-router.post('/sendMessage/:chatId', isAuth_1.default, chat_1.sendMessage);
 exports.default = router;

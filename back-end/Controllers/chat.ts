@@ -87,15 +87,15 @@ const getMessages = async (req: Request, res: Response, next: NextFunction) => {
                     model: User,
                     as: 'Users',
                     attributes: ['id', 'username'],
-                    where:{
-                        id: {[Op.not]: userId}
+                    where: {
+                        id: { [Op.not]: userId }
                     }
                 }
             ]
-    });
-       
+        });
 
-       res.status(200).json({ message: "Success in getting all messages", chat });
+
+        res.status(200).json({ message: "Success in getting all messages", chat });
 
     } catch (err) {
         console.log('error in getting all user chats');
@@ -105,34 +105,53 @@ const getMessages = async (req: Request, res: Response, next: NextFunction) => {
 
 const sendMessage = async (req: Request, res: Response, next: NextFunction) => {
     try {
-       const userId:any = req.userId;
-       const chatId = req.params.chatId;
-       const content:any = req.body.content;
+        const userId: any = req.userId;
+        const chatId: any = req.query.chatId;
+        const receiverId: any = req.query.receiverId;
+        const content: any = req.body.content;
+        let chat: any;
+
+        console.log(chatId, receiverId)
         if (!chatId) {
-            throw new CustomErrorClass('Chat not found', 400);
+            if (!receiverId) {
+                throw new CustomErrorClass('Chat not found', 400);
             }
-           // Create new message
+
+            const user = await User.findByPk(userId);
+            const friend = await User.findByPk(receiverId);
+
+
+            if (!user || !friend) {
+                throw new CustomErrorClass('User not found', 400);
+            }
+        
+            await user.addFriend(friend);
+            await friend.addFriend(user);
+
+            chat = await Chat.create({});
+            await chat.addUsers([user, friend]);
+        }
+        // Create new message
         const newMessage = await Message.create({
             content,
             senderId: userId,
         });
-        //add sender
-        
-        
-        
-        // Add message to chat
-       const chat = await Chat.findByPk(chatId);
-       await chat?.addMessage(newMessage);
 
-            
+        // Add message to chat
+        if (!chat) chat = await Chat.findByPk(chatId);
+        if (!chat) {
+            throw new CustomErrorClass('Chat not found', 400);
+        }
+        await chat?.addMessage(newMessage);
+
         res.status(201).json({ message: "Message created successfully", newMessage });
 
 
     } catch (err) {
-        console.log('error in getting all user chats');
+        console.log('error in send message');
         next(err);
     }
 };
 
 
-export { getUserChats , getMessages,sendMessage};
+export { getUserChats, getMessages, sendMessage };

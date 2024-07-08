@@ -8,6 +8,7 @@ module.exports ={
         host: process.env.database_host,
         port: process.env.database_port,
         dialect: process.env.DIALECT,
+        SECRET_KEY:process.env.SECRET_KEY,
         logging:false
     },
     production:{

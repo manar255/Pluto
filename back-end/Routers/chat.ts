@@ -8,7 +8,7 @@ import isAuth from "../Middlewares/isAuth";
 import uploadFile from "../Middlewares/uploadFile";
 
 router.get('/getUserChats',isAuth,getUserChats);
+router.post('/sendMessage',isAuth,sendMessage);
 router.get('/getMessages/:chatId',isAuth,getMessages);
-router.post('/sendMessage/:chatId',isAuth,sendMessage);
 
 export default router;

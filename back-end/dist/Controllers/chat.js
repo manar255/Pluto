@@ -113,24 +113,41 @@ exports.getMessages = getMessages;
 const sendMessage = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.userId;
-        const chatId = req.params.chatId;
+        const chatId = req.query.chatId;
+        const receiverId = req.query.receiverId;
         const content = req.body.content;
+        let chat;
+        console.log(chatId, receiverId);
         if (!chatId) {
-            throw new customErrorClass_1.default('Chat not found', 400);
+            if (!receiverId) {
+                throw new customErrorClass_1.default('Chat not found', 400);
+            }
+            const user = yield Index_1.User.findByPk(userId);
+            const friend = yield Index_1.User.findByPk(receiverId);
+            if (!user || !friend) {
+                throw new customErrorClass_1.default('User not found', 400);
+            }
+            yield user.addFriend(friend);
+            yield friend.addFriend(user);
+            chat = yield Index_1.Chat.create({});
+            yield chat.addUsers([user, friend]);
         }
         // Create new message
         const newMessage = yield Index_1.Message.create({
             content,
             senderId: userId,
         });
-        //add sender
         // Add message to chat
-        const chat = yield Index_1.Chat.findByPk(chatId);
+        if (!chat)
+            chat = yield Index_1.Chat.findByPk(chatId);
+        if (!chat) {
+            throw new customErrorClass_1.default('Chat not found', 400);
+        }
         yield (chat === null || chat === void 0 ? void 0 : chat.addMessage(newMessage));
         res.status(201).json({ message: "Message created successfully", newMessage });
     }
     catch (err) {
-        console.log('error in getting all user chats');
+        console.log('error in send message');
         next(err);
     }
 });

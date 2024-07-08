@@ -2,10 +2,15 @@ import { Request, Response, NextFunction } from "express";
 import { User } from "../Models/Index";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+
+const SECRET_KEY = process.env.SECRET_KEY || 'not found'  ;
+const JWT_EXPIRE = process.env.JWT_EXPIRE  ;
+
+
 import { error } from "console";
 const { query, validationResult } = require('express-validator');
 
-require('dotenv').config();
+// require('dotenv').config();
 
 const signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -52,10 +57,9 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
             return res.status(400).json({ message: 'Password is incorrect' });
         }
         // Create and assign token
-        const token = await jwt.sign({ userId: user.id, userName: user.userName }, "more super secret key")
+        const token = await jwt.sign({ userId: user.id, userName: user.userName }, SECRET_KEY ,{expiresIn:JWT_EXPIRE})
         // Return user
         res.status(200).json({ message: 'User Signed In Successfully', token });
-
 
     } catch (err) {
         console.log(err);

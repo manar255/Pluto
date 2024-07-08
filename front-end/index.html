@@ -87,22 +87,24 @@
 
         const token = localStorage.getItem('token');
         const sendButton = document.querySelector('button');
-        function sendButtonClick(chatId) {
+        function sendButtonClick(isNew,id) {
             sendButton.addEventListener('click', async () => {
                 const messageInput = document.querySelector('.messageInput');
                 const messageContent = messageInput.value.trim();
 
-
+                console.log(messageContent)
                 if (messageContent) {
                     socket.emit('chat message', { msg: messageContent, id: socket.id });
-                    await sendMessage(chatId, messageContent);
+                    const query=isNew?'receiverId':'chatId';
+                    await sendMessage(query,id, messageContent);
                     messageInput.value = ''; // Clear input field after sending
                 }
             });
         }
-        function sendMessage(chatId, messageContent) {
-            console.log(chatId);
-            fetch(`http://localhost:8080/api/chat/sendMessage/${chatId}`, {
+        function sendMessage(quary,id, messageContent) {
+            
+            fetch(`http://localhost:8080/api/chat/sendMessage?${quary}=${id}`, {
+
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -210,7 +212,7 @@
                                     userNameElement.textContent = `${chat.Users[0].fName} ${chat.Users[0].lName}`;
 
                                     //send message 
-                                    sendButtonClick(chat.id);
+                                    sendButtonClick(false,chat.id);
                                 })
                                 .catch(error => {
                                     console.error('Error fetching messages:', error);
@@ -269,14 +271,25 @@
                                     const addFriendButton = userElement.querySelector('.add-friend-button');
                                     addFriendButton.addEventListener('click', () => {
                                         const friendId = addFriendButton.getAttribute('data-friend-id');
-                                        addFriend(friendId);
+                                        // addFriend(friendId);
+                                        //FIXME:
+                                        document.querySelector('.welcome').style.display = 'none';
+
+                                        const messagesContainer = document.querySelector('.messages');
+                                        messagesContainer.innerHTML = '';
+
+                                    const chatContainer = document.querySelector('.chat');
+                                    chatContainer.style.display = 'block';
+                                    const userInfo = chatContainer.querySelector('.user-info');
+                                    const userImage = userInfo.querySelector('img');
+                                    const userNameElement = userInfo.querySelector('.user-name h4');
+                                    userImage.src = `/back-end/${user.imageUrl}`;
+                                    userNameElement.textContent = `${user.fName} ${user.lName}`;
+                                    //send message 
+                                    sendButtonClick(true,user.id);
                                     });
                                 }
-
                                 searchResultsContainer.appendChild(userElement);
-
-
-
 
                             });
                         } else {

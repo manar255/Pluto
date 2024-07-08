@@ -16,8 +16,10 @@ exports.signIn = exports.signUp = void 0;
 const Index_1 = require("../Models/Index");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const SECRET_KEY = process.env.SECRET_KEY || 'not found';
+const JWT_EXPIRE = process.env.JWT_EXPIRE;
 const { query, validationResult } = require('express-validator');
-require('dotenv').config();
+// require('dotenv').config();
 const signUp = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
@@ -60,7 +62,7 @@ const signIn = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
             return res.status(400).json({ message: 'Password is incorrect' });
         }
         // Create and assign token
-        const token = yield jsonwebtoken_1.default.sign({ userId: user.id, userName: user.userName }, "more super secret key");
+        const token = yield jsonwebtoken_1.default.sign({ userId: user.id, userName: user.userName }, SECRET_KEY, { expiresIn: JWT_EXPIRE });
         // Return user
         res.status(200).json({ message: 'User Signed In Successfully', token });
     }
