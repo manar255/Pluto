@@ -42,8 +42,17 @@ app.use('/api/user', userRouter);
 app.use('/api/chat', chatRouter);
 
 // Socket.IO setup
+const userSocketMap = {}; 
 io.on('connection', (socket) => {
     console.log('a user connected');
+    
+    const userId = socket.handshake.query.userId;
+    console.log('user joined', userId);
+  
+
+
+	// io.emit() is used to send events to all the connected clients
+	io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
     socket.on('chat message', data => {
         io.emit('chat message', data);

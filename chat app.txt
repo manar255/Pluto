@@ -26,7 +26,7 @@ Facebook auth.
 
 Tasks:
 -handle create chat when send new message. => done (:
--online users & chats order with socket.io.
+-online users & chats order with socket.io.=> let's start
 -fix UI/UX.
 
 

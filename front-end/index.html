@@ -60,80 +60,49 @@
 
     <script src="/front-end/chat page.js"></script>
     <script type="module">
+        let socket;
+
         import { Manager } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
-        const manager = new Manager("http://localhost:8080");
 
-        const socket = manager.socket("/");
-
-        socket.on("connect", () => {
-            console.log("connected to server");
-            socket.emit("join", { username: "Manar" });
-        });
-
-        socket.on('chat message', (data) => {
-            const messagesContainer = document.querySelector('.messages');
-            const messageElement = document.createElement('div');
-
-            if (socket.id === data.id) {
-                messageElement.classList.add('send-message');
-            } else {
-                messageElement.classList.add('receive-message');
-            }
-            messageElement.innerHTML = `<p>${data.msg}</p>`;
-            messagesContainer.appendChild(messageElement);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-        });
-
-        const token = localStorage.getItem('token');
-        const sendButton = document.querySelector('button');
-        function sendButtonClick(isNew,id) {
-            sendButton.addEventListener('click', async () => {
-                const messageInput = document.querySelector('.messageInput');
-                const messageContent = messageInput.value.trim();
-
-                console.log(messageContent)
-                if (messageContent) {
-                    socket.emit('chat message', { msg: messageContent, id: socket.id });
-                    const query=isNew?'receiverId':'chatId';
-                    await sendMessage(query,id, messageContent);
-                    messageInput.value = ''; // Clear input field after sending
-                }
-            });
-        }
-        function sendMessage(quary,id, messageContent) {
-            
-            fetch(`http://localhost:8080/api/chat/sendMessage?${quary}=${id}`, {
-
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+        function connectSocket(userId) {
+            const manager = new Manager("http://localhost:8080/", {
+                query: {
+                    userId: userId,
                 },
-                body: JSON.stringify({
-                    content: messageContent
-                })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to send message');
-                    }
-                    // Handle success if needed
-                })
-                .catch(error => {
-                    console.error('Error sending message:', error);
-                });
+            });
+            const socket = manager.socket("");
+
+            socket.on('connect', () => {
+                console.log("connected to server with user ID:", userId);
+            });
+
+            socket.on('chat message', (data) => {
+                const messagesContainer = document.querySelector('.messages');
+                const messageElement = document.createElement('div');
+
+                if (socket.id === data.id) {
+                    messageElement.classList.add('send-message');
+                } else {
+                    messageElement.classList.add('receive-message');
+                }
+                messageElement.innerHTML = `<p>${data.msg}</p>`;
+                messagesContainer.appendChild(messageElement);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            });
+
+            return socket;
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        async function getUserInfo() {
             fetch('http://localhost:8080/api/user/userInfo', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             })
                 .then(response => response.json())
-                .then(data => {
+                .then(async data => {
                     const user = data.data;
+                    socket = await connectSocket(user.id);
                     const userElement = document.querySelector('.user');
                     const userImage = userElement.querySelector('img');
                     const userName = userElement.querySelector('h5');
@@ -144,7 +113,9 @@
                 .catch(error => {
                     console.error('Error fetching user info:', error);
                 });
+        }
 
+        function getUserChats() {
             fetch('http://localhost:8080/api/chat/getUserChats', {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -156,34 +127,31 @@
                     data.user.Chats.sort((a, b) => new Date(b.Messages[0].createdAt) - new Date(a.Messages[0].createdAt));
                     data.user.Chats.forEach(chat => {
                         const chatId = chat.id;
-                        
 
                         const chatCard = document.createElement('div');
                         chatCard.classList.add('chat-card');
 
                         chatCard.innerHTML = `
-                        <img src="/back-end/${chat.Users[0].imageUrl}" width="50" height="50" />
-                        <div class="card-data">
-                            <div class="right">
-                                <h4 class="name">${chat.Users[0].fName} ${chat.Users[0].lName}</h4>
-                                <p class="msg">${chat.Messages.length > 0 ? chat.Messages[0].content : ''}</p>
-                            </div>
-                            <p class="time">${chat.Messages.length > 0 ? new Date(chat.Messages[0].createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</p>
-                        </div>
-                    `;
+                <img src="/back-end/${chat.Users[0].imageUrl}" width="50" height="50" />
+                <div class="card-data">
+                    <div class="right">
+                        <h4 class="name">${chat.Users[0].fName} ${chat.Users[0].lName}</h4>
+                        <p class="msg">${chat.Messages.length > 0 ? chat.Messages[0].content : ''}</p>
+                    </div>
+                    <p class="time">${chat.Messages.length > 0 ? new Date(chat.Messages[0].createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</p>
+                </div>
+            `;
 
                         chatsContainer.appendChild(chatCard);
 
                         chatCard.addEventListener('click', async () => {
-                            
                             fetch(`http://localhost:8080/api/chat/getMessages/${chat.id}`, {
                                 headers: {
                                     'Authorization': `Bearer ${token}`
                                 }
                             })
                                 .then(response => response.json())
-                                .then(messagesData => {
-                                    
+                                .then(async messagesData => {
                                     const messagesContainer = document.querySelector('.messages');
                                     messagesContainer.innerHTML = ''; // Clear previous messages
 
@@ -212,22 +180,66 @@
                                     userNameElement.textContent = `${chat.Users[0].fName} ${chat.Users[0].lName}`;
 
                                     //send message 
-                                    sendButtonClick(false,chat.id);
+                                    await sendButtonClick(false, chat.id);
                                 })
                                 .catch(error => {
                                     console.error('Error fetching messages:', error);
                                 });
                         });
-
-
                     });
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
                 });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await getUserInfo();
+            await getUserChats();
         });
 
-        // Search functionality
+        const token = localStorage.getItem('token');
+        const sendButton = document.querySelector('button');
+
+        function sendButtonClick(isNew, id) {
+            sendButton.removeEventListener('click', handleSendMessage); // Remove any previous listeners
+            sendButton.addEventListener('click', handleSendMessage);
+
+            async function handleSendMessage() {
+                const messageInput = document.querySelector('.messageInput');
+                const messageContent = messageInput.value.trim();
+
+                if (messageContent) {
+                    socket.emit('chat message', { msg: messageContent, id: socket.id });
+                    const query = isNew ? 'receiverId' : 'chatId';
+                    await sendMessage(query, id, messageContent);
+                    messageInput.value = ''; // Clear input field after sending
+                }
+            }
+        }
+
+        function sendMessage(query, id, messageContent) {
+            fetch(`http://localhost:8080/api/chat/sendMessage?${query}=${id}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    content: messageContent
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to send message');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error sending message:', error);
+                });
+        }
+
+        /*----------------------- Search functionality--------------------*/
         const searchInput = document.querySelector('.search input');
         const searchResultsContainer = document.querySelector('.search-results');
 
@@ -258,16 +270,15 @@
                                 <p>@${user.userName}</p>
                             </div>
                         `;
-                                }
-                                else {
+                                } else {
                                     userElement.innerHTML = `
-                                    <img src="/back-end/${user.imageUrl}" width="50" height="50" />
-                                    <div class="result-data">
-                                        <h4>${user.fName} ${user.lName}</h4>
-                                        <p>@${user.userName}</p>
-                                    </div>
-                                    <button class="add-friend-button" data-friend-id="${user.id}">Message</button>
-                                `;
+                            <img src="/back-end/${user.imageUrl}" width="50" height="50" />
+                            <div class="result-data">
+                                <h4>${user.fName} ${user.lName}</h4>
+                                <p>@${user.userName}</p>
+                            </div>
+                            <button class="add-friend-button" data-friend-id="${user.id}">Message</button>
+                        `;
                                     const addFriendButton = userElement.querySelector('.add-friend-button');
                                     addFriendButton.addEventListener('click', () => {
                                         const friendId = addFriendButton.getAttribute('data-friend-id');
@@ -278,19 +289,18 @@
                                         const messagesContainer = document.querySelector('.messages');
                                         messagesContainer.innerHTML = '';
 
-                                    const chatContainer = document.querySelector('.chat');
-                                    chatContainer.style.display = 'block';
-                                    const userInfo = chatContainer.querySelector('.user-info');
-                                    const userImage = userInfo.querySelector('img');
-                                    const userNameElement = userInfo.querySelector('.user-name h4');
-                                    userImage.src = `/back-end/${user.imageUrl}`;
-                                    userNameElement.textContent = `${user.fName} ${user.lName}`;
-                                    //send message 
-                                    sendButtonClick(true,user.id);
+                                        const chatContainer = document.querySelector('.chat');
+                                        chatContainer.style.display = 'block';
+                                        const userInfo = chatContainer.querySelector('.user-info');
+                                        const userImage = userInfo.querySelector('img');
+                                        const userNameElement = userInfo.querySelector('.user-name h4');
+                                        userImage.src = `/back-end/${user.imageUrl}`;
+                                        userNameElement.textContent = `${user.fName} ${user.lName}`;
+                                        //send message 
+                                        sendButtonClick(true, user.id);
                                     });
                                 }
                                 searchResultsContainer.appendChild(userElement);
-
                             });
                         } else {
                             searchResultsContainer.style.display = 'none'; // Hide if no results
@@ -304,25 +314,8 @@
                 searchResultsContainer.style.display = 'none'; // Hide results container if input is empty
             }
         });
-        function addFriend(friendId) {
-            fetch(`http://localhost:8080/api/user/addFriend/${friendId}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to add friend');
-                    }
-                    // Handle success if needed
-                    console.log('Friend added successfully');
-                })
-                .catch(error => {
-                    console.error('Error adding friend:', error);
-                });
-        }
+
+      
     </script>
 </body>
 
