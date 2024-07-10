@@ -62,15 +62,20 @@ app.use('/api/chat', chat_1.default);
 const userSocketMap = {};
 io.on('connection', (socket) => {
     console.log('a user connected');
-    const userId = socket.handshake.query.userId;
+    let userId = socket.handshake.query.userId || 'lol';
+    if (Array.isArray(userId)) {
+        userId = userId[0];
+    }
+    userSocketMap[userId] = socket.id;
     console.log('user joined', userId);
-    // io.emit() is used to send events to all the connected clients
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
     socket.on('chat message', data => {
         io.emit('chat message', data);
     });
     socket.on('disconnect', () => {
         console.log('user disconnected');
+        io.emit('user-disconnected', userId);
+        delete userSocketMap[userId];
     });
 });
 // Error handling

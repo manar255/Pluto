@@ -42,24 +42,31 @@ app.use('/api/user', userRouter);
 app.use('/api/chat', chatRouter);
 
 // Socket.IO setup
-const userSocketMap = {}; 
+const userSocketMap: { [key: string]: string } = {};
 io.on('connection', (socket) => {
     console.log('a user connected');
     
-    const userId = socket.handshake.query.userId;
+    let userId: string |string[] = socket.handshake.query.userId || 'lol';
+    if (Array.isArray(userId)) {
+        userId = userId[0];
+    }
+    
+    userSocketMap[userId] = socket.id;
     console.log('user joined', userId);
-  
 
 
-	// io.emit() is used to send events to all the connected clients
+	
 	io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
     socket.on('chat message', data => {
         io.emit('chat message', data);
+        
     });
-
+    
     socket.on('disconnect', () => {
         console.log('user disconnected');
+        io.emit('user-disconnected', userId);
+        delete userSocketMap[userId];
     });
 });
 

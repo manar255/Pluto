@@ -144,13 +144,24 @@ header .user {
     border-bottom: 2px solid #6e386c; /* Lighter pink border */
     padding-bottom: 10px;
     margin-bottom: 10px;
+    position: relative;
 }
 
+ .online{
+    width: 12px;
+    height: 12px;
+    background-color: rgba(25, 159, 25, 0.801);
+    border-radius: 50%;
+    position: absolute;
+    bottom: 66px;
+    left: 48px;
+}
 .chat-card img {
     width: 50px;
     height: 50px;
     border-radius: 50%;
     margin: 10px;
+   
 }
 
 .card-data {
