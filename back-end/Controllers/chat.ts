@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { Chat, Message, User, db } from "../Models/Index";
 import CustomErrorClass from '../types/customErrorClass'
 import { Op } from 'sequelize';
+import { io, userSocketMap , } from '../index'
 
 // import User from "../Models/User";
 
@@ -124,7 +125,7 @@ const sendMessage = async (req: Request, res: Response, next: NextFunction) => {
             if (!user || !friend) {
                 throw new CustomErrorClass('User not found', 400);
             }
-        
+
             await user.addFriend(friend);
             await friend.addFriend(user);
 
@@ -138,11 +139,27 @@ const sendMessage = async (req: Request, res: Response, next: NextFunction) => {
         });
 
         // Add message to chat
-        if (!chat) chat = await Chat.findByPk(chatId);
+        if (!chat) {
+            chat = await Chat.findByPk(chatId);
+        }
         if (!chat) {
             throw new CustomErrorClass('Chat not found', 400);
         }
         await chat?.addMessage(newMessage);
+
+        // Socket.IO - Notify users about the new message
+        const chatUsers = await chat.getUsers();
+
+        chatUsers.forEach((user: any) => {
+            if (userSocketMap[user.id]) {
+                io.to(userSocketMap[user.id]).emit('new message', {
+                    chatId: chat.id,
+                    msg: content,
+                    id: userSocketMap[userId],
+                    
+                });
+            }
+        });
 
         res.status(201).json({ message: "Message created successfully", newMessage });
 

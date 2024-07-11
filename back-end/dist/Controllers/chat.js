@@ -16,6 +16,7 @@ exports.sendMessage = exports.getMessages = exports.getUserChats = void 0;
 const Index_1 = require("../Models/Index");
 const customErrorClass_1 = __importDefault(require("../types/customErrorClass"));
 const sequelize_1 = require("sequelize");
+const index_1 = require("../index");
 // import User from "../Models/User";
 require('dotenv').config();
 const getUserChats = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -138,12 +139,24 @@ const sendMessage = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             senderId: userId,
         });
         // Add message to chat
-        if (!chat)
+        if (!chat) {
             chat = yield Index_1.Chat.findByPk(chatId);
+        }
         if (!chat) {
             throw new customErrorClass_1.default('Chat not found', 400);
         }
         yield (chat === null || chat === void 0 ? void 0 : chat.addMessage(newMessage));
+        // Socket.IO - Notify users about the new message
+        const chatUsers = yield chat.getUsers();
+        chatUsers.forEach((user) => {
+            if (index_1.userSocketMap[user.id]) {
+                index_1.io.to(index_1.userSocketMap[user.id]).emit('new message', {
+                    chatId: chat.id,
+                    msg: content,
+                    id: index_1.userSocketMap[userId],
+                });
+            }
+        });
         res.status(201).json({ message: "Message created successfully", newMessage });
     }
     catch (err) {

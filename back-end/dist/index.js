@@ -26,6 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.userSocketMap = exports.io = void 0;
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const cors_1 = __importDefault(require("cors"));
@@ -41,7 +42,7 @@ dotenv.config();
 const app = (0, express_1.default)();
 app.use(express_1.default.static(path_1.default.join(__dirname, 'public')));
 const server = http_1.default.createServer(app);
-const io = new socket_io_1.Server(server, {
+exports.io = new socket_io_1.Server(server, {
     cors: {
         origin: "*", // Adjust this to your needs
         methods: ["GET", "POST"]
@@ -59,23 +60,20 @@ app.use('/api/auth', auth_1.default);
 app.use('/api/user', user_1.default);
 app.use('/api/chat', chat_1.default);
 // Socket.IO setup
-const userSocketMap = {};
-io.on('connection', (socket) => {
+exports.userSocketMap = {};
+exports.io.on('connection', (socket) => {
     console.log('a user connected');
     let userId = socket.handshake.query.userId || 'lol';
     if (Array.isArray(userId)) {
         userId = userId[0];
     }
-    userSocketMap[userId] = socket.id;
-    console.log('user joined', userId);
-    io.emit("getOnlineUsers", Object.keys(userSocketMap));
-    socket.on('chat message', data => {
-        io.emit('chat message', data);
-    });
+    exports.userSocketMap[userId] = socket.id;
+    console.log('user joined', exports.userSocketMap);
+    exports.io.emit("getOnlineUsers", Object.keys(exports.userSocketMap));
     socket.on('disconnect', () => {
         console.log('user disconnected');
-        io.emit('user-disconnected', userId);
-        delete userSocketMap[userId];
+        exports.io.emit('user-disconnected', userId);
+        delete exports.userSocketMap[userId];
     });
 });
 // Error handling

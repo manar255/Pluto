@@ -17,9 +17,9 @@ const app: Express = express();
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-const server = http.createServer(app);
+ const server = http.createServer(app);
 
-const io = new Server(server, {
+export const io = new Server(server, {
     cors: {
         origin: "*", // Adjust this to your needs
         methods: ["GET", "POST"]
@@ -42,7 +42,7 @@ app.use('/api/user', userRouter);
 app.use('/api/chat', chatRouter);
 
 // Socket.IO setup
-const userSocketMap: { [key: string]: string } = {};
+export const userSocketMap: { [key: string]: string } = {};
 io.on('connection', (socket) => {
     console.log('a user connected');
     
@@ -52,16 +52,13 @@ io.on('connection', (socket) => {
     }
     
     userSocketMap[userId] = socket.id;
-    console.log('user joined', userId);
+    console.log('user joined', userSocketMap);
 
 
 	
 	io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
-    socket.on('chat message', data => {
-        io.emit('chat message', data);
-        
-    });
+    
     
     socket.on('disconnect', () => {
         console.log('user disconnected');

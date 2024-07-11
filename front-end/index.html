@@ -157,16 +157,15 @@
 
             });
 
-            socket.on('chat message', (data) => {
+            socket.on('new message', (data) => {
                 const messagesContainer = document.querySelector('.messages');
                 const messageElement = document.createElement('div');
-
+                console.log(data)
                 if (socket.id === data.id) {
                     messageElement.classList.add('send-message');
                 } else {
                     messageElement.classList.add('receive-message');
                 }
-
                 messageElement.innerHTML = `<p>${data.msg}</p>`;
                 messagesContainer.appendChild(messageElement);
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -277,8 +276,8 @@
                     const messageContent = messageInput.value.trim();
 
                     if (messageContent) {
-
-                        socket.emit('chat message', { msg: messageContent, id: socket.id });
+                        
+                        //socket.emit('chat message', { msg: messageContent, id: socket.id});
                         const query = isNew ? 'receiverId' : 'chatId';
                         await sendMessage(query, id, messageContent);
                         messageInput.value = ''; // Clear input field after sending
