@@ -48,6 +48,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="messages">
                 <!-- Messages will be dynamically added here -->
             </div>
@@ -133,7 +134,7 @@
             });
 
             socket.on('user-disconnected', (userId) => {
-               
+
                 const chatsContainer = document.querySelector('.chat-cards');
 
                 const chatCards = chatsContainer.querySelectorAll('.chat-card');
@@ -143,7 +144,7 @@
 
                     const onlineIndicator = chatCard.querySelector('.online');
 
-                    if (chatUserId ==userId) {
+                    if (chatUserId == userId) {
                         onlineIndicator.style.display = 'none'; // Show online indicator
                     }
                 });
@@ -220,6 +221,11 @@
                             chatsContainer.appendChild(chatCard);
 
                             chatCard.addEventListener('click', async () => {
+                                const currentChat = document.querySelector('.chat');
+                                if (currentChat) {
+                                    currentChat.style.display = 'none';
+                                }
+
                                 fetch(`http://localhost:8080/api/chat/getMessages/${chat.id}`, {
                                     headers: {
                                         'Authorization': `Bearer ${token}`
@@ -245,6 +251,12 @@
                                         });
 
                                         document.querySelector('.welcome').style.display = 'none';
+                                        document.querySelector('.chat').style.display = 'block';
+
+
+
+
+
 
                                         const chatContainer = document.querySelector('.chat');
                                         chatContainer.style.display = 'block';
@@ -255,7 +267,21 @@
                                         userNameElement.textContent = `${chat.Users[0].fName} ${chat.Users[0].lName}`;
 
                                         //send message 
-                                        await sendButtonClick(false, chat.id);
+                                        sendButton.onclick = function () {      
+                                                const messageInput = document.querySelector('.messageInput');
+                                                const messageContent = messageInput.value.trim();
+
+                                                if (messageContent) {
+
+                                                    //socket.emit('chat message', { msg: messageContent, id: socket.id});
+                                                    // const query = isNew ? 'receiverId' : 'chatId';
+                                                    const q ='chatId'
+                                                    // console.log(chat.id)
+                                                     sendMessage(q, chat.id, messageContent);
+                                                    messageInput.value = ''; // Clear input field after sending
+                                                }
+                                            
+                                        }
                                     })
                                     .catch(error => {
                                         console.error('Error fetching messages:', error);
@@ -267,25 +293,9 @@
                         console.error('Error fetching data:', error);
                     });
             }
-            function sendButtonClick(isNew, id) {
-                sendButton.removeEventListener('click', handleSendMessage); // Remove any previous listeners
-                sendButton.addEventListener('click', handleSendMessage);
-
-                async function handleSendMessage() {
-                    const messageInput = document.querySelector('.messageInput');
-                    const messageContent = messageInput.value.trim();
-
-                    if (messageContent) {
-                        
-                        //socket.emit('chat message', { msg: messageContent, id: socket.id});
-                        const query = isNew ? 'receiverId' : 'chatId';
-                        await sendMessage(query, id, messageContent);
-                        messageInput.value = ''; // Clear input field after sending
-                    }
-                }
-            }
-
+           
             function sendMessage(query, id, messageContent) {
+                // console.log(id)
                 fetch(`http://localhost:8080/api/chat/sendMessage?${query}=${id}`, {
                     method: 'POST',
                     headers: {
